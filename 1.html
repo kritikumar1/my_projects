@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Surprise</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #envelope-page {
+      text-align: center;
+    }
+    #open-btn {
+      padding: 15px 30px;
+      font-size: 20px;
+      border: none;
+      background-color: #ff4081;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #open-btn:hover {
+      background-color: #e73370;
+    }
+
+    #main-content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .slider {
+      width: 90%;
+      max-width: 800px;
+      height: 100%;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .slides {
+      display: flex;
+      width: 100%;
+      animation: slide 25s infinite;
+    }
+    .slides img {
+      width: 100%;
+      height: 100%;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+
+    @keyframes slide {
+      0%, 20% { transform: translateX(0); }
+      25%, 45% { transform: translateX(-100%); }
+      50%, 70% { transform: translateX(-200%); }
+      75%, 95% { transform: translateX(-300%); }
+      100% { transform: translateX(-400%); }
+    }
+
+    .emoji-blast {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      animation: blast 4s infinite ease-in-out;
+    }
+    @keyframes blast {
+      0% { transform: translate(-50%, 0); opacity: 1; }
+      100% { transform: translate(-50%, -500px); opacity: 0; }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    @media (max-width: 480px) {
+  .slider {
+    width: 100%;
+    aspect-ratio: 16/9;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div id="envelope-page">
+    <h1>Please Open It 🎁</h1>
+    <button id="open-btn">Open Envelope</button>
+  </div>
+
+  <div id="main-content">
+    <div class="slider">
+      <div class="slides">
+        <img src="1.png" alt="Photo 1">
+        <img src="2.png" alt="Photo 2">
+        <img src="3.png" alt="Photo 3">
+        <img src="4.png" alt="Photo 4">
+        <img src="5.png" alt="Photo 5">
+      </div>
+    </div>
+    <h1>🎉 Happy Birthday! 🎉</h1>
+    <p>Wishing you joy, love, and endless memories today!</p>
+    <div class="emoji-blast">🎈🎂🎉🧁🎁</div>
+    <canvas id="fireworks"></canvas>
+  </div>
+
+  <script>
+    const openBtn = document.getElementById('open-btn');
+    const envelopePage = document.getElementById('envelope-page');
+    const mainContent = document.getElementById('main-content');
+
+    openBtn.addEventListener('click', () => {
+      envelopePage.style.display = 'none';
+      mainContent.style.display = 'flex';
+      startFireworks();
+    });
+
+    function startFireworks() {
+      const canvas = document.getElementById('fireworks');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const fireworks = [];
+      class Firework {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = canvas.height;
+          this.targetY = Math.random() * canvas.height / 2;
+          this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+          this.size = 2 + Math.random() * 3;
+          this.speed = 3 + Math.random() * 2;
+        }
+        update() {
+          this.y -= this.speed;
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (Math.random() < 0.05) fireworks.push(new Firework());
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+          const f = fireworks[i];
+          f.update();
+          f.draw();
+          if (f.y < f.targetY) fireworks.splice(i, 1);
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>
